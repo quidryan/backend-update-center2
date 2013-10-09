@@ -25,25 +25,18 @@ package org.jvnet.hudson.update_center;
 
 import hudson.util.VersionNumber;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.sonatype.nexus.index.ArtifactInfo;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-import java.util.zip.ZipEntry;
+import java.util.Map;
 
 /**
  * Artifact from a Maven repository and its metadata.
@@ -61,7 +54,8 @@ public class MavenArtifact {
 
     // lazily computed
     private long timestamp;
-    private Manifest manifest;
+    private Map<String, String> manifestAttributes;
+    private String digest;
 
     public MavenArtifact(MavenRepository repository, ArtifactInfo artifact) {
         this.artifact = artifact;
@@ -71,8 +65,10 @@ public class MavenArtifact {
 
     public File resolve() throws IOException {
         try {
-            if (hpi==null)
+            if (hpi==null) {
+                // Delegate to repository
                 hpi = repository.resolve(artifact);
+            }
             return hpi;
         } catch (IllegalArgumentException e) {
             /*
@@ -122,18 +118,11 @@ public class MavenArtifact {
      * Computes the SHA1 signature of the file.
      */
     public String getDigest() throws IOException {
-        try {
-            MessageDigest sig = MessageDigest.getInstance("SHA1");
-            FileInputStream fin = new FileInputStream(resolve());
-            byte[] buf = new byte[2048];
-            int len;
-            while ((len=fin.read(buf,0,buf.length))>=0)
-                sig.update(buf,0,len);
-
-            return new String(Base64.encodeBase64(sig.digest()));
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException(e);
+        if (digest==null) {
+            // Delegate to repository
+            digest = repository.loadDigest(artifact);
         }
+        return digest;
     }
 
     public JSONObject toJSON(String name) throws IOException {
@@ -182,31 +171,21 @@ public class MavenArtifact {
     public static SimpleDateFormat getDateFormat() {
         return new SimpleDateFormat("MMM dd, yyyy", Locale.US);
     }
-        
+
     public long getTimestamp() throws IOException {
-        if (timestamp==0)
-            getManifest();
+        if (timestamp==0) {
+            // Delegate to respository, for external calls
+            timestamp = repository.loadTimestamp(artifact);
+        }
         return timestamp;
     }
 
-    public Manifest getManifest() throws IOException {
-        if (manifest==null) {
-            File f = resolve();
-            try {
-                JarFile jar = new JarFile(f);
-                ZipEntry e = jar.getEntry("META-INF/MANIFEST.MF");
-                timestamp = e.getTime();
-                manifest = jar.getManifest();
-                jar.close();
-            } catch (IOException x) {
-                throw (IOException)new IOException("Failed to open "+f).initCause(x);
-            }
+    public Map<String, String> getManifestAttributes() throws IOException {
+        if (manifestAttributes==null) {
+            // Delegate to repository
+            manifestAttributes = repository.loadManifestAttributes(artifact);
         }
-        return manifest;
-    }
-
-    public Attributes getManifestAttributes() throws IOException {
-        return getManifest().getMainAttributes();
+        return manifestAttributes;
     }
 
     /**

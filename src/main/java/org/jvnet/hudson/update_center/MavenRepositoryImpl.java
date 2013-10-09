@@ -249,7 +249,7 @@ public class MavenRepositoryImpl extends MavenRepository {
         return plugins.values();
     }
 
-    public TreeMap<VersionNumber,HudsonWar> getHudsonWar() throws IOException, AbstractArtifactResolutionException {
+    public TreeMap<VersionNumber,HudsonWar> getHudsonWar() throws IOException {
         TreeMap<VersionNumber,HudsonWar> r = new TreeMap<VersionNumber, HudsonWar>(VersionNumber.DESCENDING);
         listWar(r, "org.jenkins-ci.main", null);
         listWar(r, "org.jvnet.hudson.main", CUT_OFF);
@@ -281,7 +281,7 @@ public class MavenRepositoryImpl extends MavenRepository {
     Hook for subtypes to use customized implementations.
  */
 
-    protected HPI createHpiArtifact(ArtifactInfo a, PluginHistory p) throws AbstractArtifactResolutionException {
+    protected HPI createHpiArtifact(ArtifactInfo a, PluginHistory p) {
         return new HPI(this,p,a);
     }
 
