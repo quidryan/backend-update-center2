@@ -100,6 +100,9 @@ public class Main {
     @Option(name="-no-experimental",usage="Exclude alpha/beta releases")
     public boolean noExperimental;
 
+    @Option(name="-leverageArtifactory",usage="Leverage Artifactory API when possible for performance")
+    public boolean leverageArtifactory;
+
     public Signer signer = new Signer();
 
     public static final String EOL = System.getProperty("line.separator");
@@ -195,7 +198,9 @@ public class Main {
     }
 
     protected MavenRepository createRepository() throws Exception {
-        MavenRepository repo = DefaultMavenRepositoryBuilder.createStandardInstance();
+        MavenRepository repo = leverageArtifactory ?
+                DefaultMavenRepositoryBuilder.createArtifactoryInstance() :
+                DefaultMavenRepositoryBuilder.createStandardInstance();
         if (maxPlugins!=null)
             repo = new TruncatedMavenRepository(repo,maxPlugins);
         if (cap!=null)

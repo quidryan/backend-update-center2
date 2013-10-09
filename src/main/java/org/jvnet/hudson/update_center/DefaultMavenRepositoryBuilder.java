@@ -32,4 +32,10 @@ public class DefaultMavenRepositoryBuilder {
 
         return instance;
     }
+    public static ArtifactoryRepository createArtifactoryInstance() throws Exception {
+        ArtifactoryRepository instance = new ArtifactoryRepository();
+        instance.addRemoteRepository("public", new URL("http://repo.jenkins-ci.org/public/"));
+
+        return instance;
+    }
 }
