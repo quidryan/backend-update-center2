@@ -25,7 +25,7 @@ public class VersionCappedMavenRepository extends MavenRepository {
     /**
      * Version number to cap. We only report the portion of data that's compatible with this version.
      */
-    private final VersionNumber cap;
+        private final VersionNumber cap;
 
     public VersionCappedMavenRepository(MavenRepository base, VersionNumber cap) {
         this.base = base;

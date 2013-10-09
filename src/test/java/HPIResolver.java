@@ -44,35 +44,19 @@ public class HPIResolver {
         HPI plugin = mavenRepository.findPlugin(groupId, artifactId, version);
 
         MavenArtifact mavenArtifact = new MavenArtifact(mavenRepository, plugin.artifact);
-        Manifest manifest = mavenArtifact.getManifest();
 
-        Attributes mainAttributes = manifest.getMainAttributes();
+        Map<String, String> mainAttributes = mavenArtifact.getManifestAttributes();
 
-        List<Attributes.Name> attributeNames = sortAttributes(mainAttributes);
+        List<String> attributeNames = sortAttributes(mainAttributes);
         for (Object entry : attributeNames) {
             System.out.println(entry + ":" + mainAttributes.get(entry));
         }
     }
 
-    private static List<Attributes.Name> sortAttributes(Attributes mainAttributes) {
-        List<Attributes.Name> attributeNames = toList(mainAttributes.keySet());
-        Collections.sort(attributeNames, new AttributesNameNaturalOrder());
+    private static List<String> sortAttributes(Map<String, String> mainAttributes) {
+        List<String> attributeNames = new ArrayList<String>(mainAttributes.keySet());
+        Collections.sort(attributeNames);
         return attributeNames;
-    }
-
-    private static List<Attributes.Name> toList(Set<Object> objects) {
-        List<Attributes.Name> result = new ArrayList<Attributes.Name>();
-        for (Object object : objects) {
-            result.add((Attributes.Name) object);
-        }
-        return result;
-    }
-
-    private static class AttributesNameNaturalOrder implements Comparator<Attributes.Name> {
-        public int compare(Attributes.Name o1, Attributes.Name o2) {
-            return o1.toString().compareTo(o2.toString());
-        }
-
     }
 
     public static void main(String[] args) throws Exception {

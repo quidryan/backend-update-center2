@@ -49,7 +49,7 @@ public class HPI extends MavenArtifact {
 
     private final Pattern developersPattern = Pattern.compile("([^:]*):([^:]*):([^,]*),?");
 
-    public HPI(MavenRepository repository, PluginHistory history, ArtifactInfo artifact) throws AbstractArtifactResolutionException {
+    public HPI(MavenRepository repository, PluginHistory history, ArtifactInfo artifact) {
         super(repository, artifact);
         this.history = history;
     }
@@ -65,7 +65,7 @@ public class HPI extends MavenArtifact {
      * Who built this release?
      */
     public String getBuiltBy() throws IOException {
-        return getManifestAttributes().getValue("Built-By");
+        return getManifestAttributes().get("Built-By");
     }
 
     /**
@@ -73,14 +73,14 @@ public class HPI extends MavenArtifact {
      *      Most probably you should be using {@link #getRequiredJenkinsVersion()}
      */
     public String getRequiredHudsonVersion() throws IOException {
-        return getManifestAttributes().getValue("Hudson-Version");
+        return getManifestAttributes().get("Hudson-Version");
     }
 
     public String getRequiredJenkinsVersion() throws IOException {
-        String v = getManifestAttributes().getValue("Jenkins-Version");
+        String v = getManifestAttributes().get("Jenkins-Version");
         if (v!=null)        return v;
 
-        v = getManifestAttributes().getValue("Hudson-Version");
+        v = getManifestAttributes().get("Hudson-Version");
         if (fixNull(v) != null) {
             try {
                 VersionNumber n = new VersionNumber(v);
@@ -106,19 +106,19 @@ public class HPI extends MavenArtifact {
     }
 
     public String getCompatibleSinceVersion() throws IOException {
-        return getManifestAttributes().getValue("Compatible-Since-Version");
+        return getManifestAttributes().get("Compatible-Since-Version");
     }
 
     public String getDisplayName() throws IOException {
-        return getManifestAttributes().getValue("Long-Name");
+        return getManifestAttributes().get("Long-Name");
     }
 
     public String getSandboxStatus() throws IOException {
-        return getManifestAttributes().getValue("Sandbox-Status");
+        return getManifestAttributes().get("Sandbox-Status");
     }
 
     public List<Dependency> getDependencies() throws IOException {
-        String deps = getManifestAttributes().getValue("Plugin-Dependencies");
+        String deps = getManifestAttributes().get("Plugin-Dependencies");
         if(deps==null)  return Collections.emptyList();
 
         List<Dependency> r = new ArrayList<Dependency>();
@@ -128,7 +128,7 @@ public class HPI extends MavenArtifact {
     }
 
     public List<Developer> getDevelopers() throws IOException {
-        String devs = getManifestAttributes().getValue("Plugin-Developers");
+        String devs = getManifestAttributes().get("Plugin-Developers");
         if (devs == null || devs.trim().length()==0) return Collections.emptyList();
 
         List<Developer> r = new ArrayList<Developer>();

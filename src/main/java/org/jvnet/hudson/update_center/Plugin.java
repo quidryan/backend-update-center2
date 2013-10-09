@@ -109,7 +109,7 @@ public class Plugin {
         List<HPI> versions = new ArrayList<HPI>();
         for (HPI h : hpi.artifacts.values()) {
             try {
-                h.getManifest();
+                h.resolve();
                 versions.add(h);
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Failed to resolve "+h+". Dropping this version.",e);
@@ -168,7 +168,7 @@ public class Plugin {
      * First we'll try to parse POM and obtain the URL.
      * If that fails, find the nearest name from the children list.
      */
-    private RemotePage findPage(ConfluencePluginList cpl) throws IOException {
+    private RemotePage findPage(ConfluencePluginList cpl) {
         try {
             String p = OVERRIDES.getProperty(artifactId);
             if(p!=null)
@@ -235,7 +235,7 @@ public class Plugin {
                                             parent.element("groupId").getTextTrim(),
                                             parent.element("artifactId").getTextTrim(),
                                             parent.element("version").getTextTrim(),
-                                            ""), "pom", null));
+                                            ""), "pom", null))  ;
                     scm = selectSingleValue(parentPom, "/project/scm/connection");
                 } catch (Exception ex) {
                     System.out.println("** Failed to read parent pom");

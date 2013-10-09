@@ -92,8 +92,7 @@ public class Signer {
      * Because it mutates the signed object itself, validating the signature needs a bit of work,
      * but this enables a signature to be added transparently.
      *
-     * @return
-     *      The same value passed as the argument so that the method can be used like a filter.
+     * @return The same value passed as the argument so that the method can be used like a filter.
      */
     public JSONObject sign(JSONObject o) throws GeneralSecurityException, IOException, CmdLineException {
         if (!isConfigured())    return o;
@@ -140,7 +139,7 @@ public class Signer {
         private final TeeOutputStream out;
         private final Signature verifier;
 
-        SignatureGenerator(X509Certificate signer, PrivateKey key) throws GeneralSecurityException, IOException {
+        SignatureGenerator(X509Certificate signer, PrivateKey key) throws GeneralSecurityException {
             // this is for computing a digest
             sha1 = MessageDigest.getInstance("SHA1");
             DigestOutputStream dos = new DigestOutputStream(new NullOutputStream(), sha1);
@@ -162,7 +161,7 @@ public class Signer {
             return out;
         }
 
-        public void addRecord(JSONObject sign, String prefix) throws GeneralSecurityException, IOException {
+        public void addRecord(JSONObject sign, String prefix) throws GeneralSecurityException {
             // digest
             byte[] digest = sha1.digest();
             sign.put(prefix+"digest",new String(Base64.encodeBase64(digest)));
@@ -204,7 +203,7 @@ public class Signer {
         return certs;
     }
 
-    private X509Certificate loadCertificate(CertificateFactory cf, File f) throws CertificateException, IOException {
+    private X509Certificate loadCertificate(CertificateFactory cf, File f) throws IOException {
         try {
             FileInputStream in = new FileInputStream(f);
             try {
